@@ -1967,7 +1967,7 @@ class SolarEdgeInverter:
             sw_version=self.fw_version,
             hw_version=self.option,
         )
-        if self.hub.option_area_id is not None:
+        if self.hub.option_area_id:
             info["suggested_area"] = self.hub.option_area_id
         return info
 
@@ -2015,7 +2015,7 @@ class SolarEdgeMMPPTUnit:
             serial_number=f"{self.mmppt_idstr}",
             via_device=(DOMAIN, self.inverter.uid_base),
         )
-        if self.hub.option_area_id is not None:
+        if self.hub.option_area_id:
             info["suggested_area"] = self.hub.option_area_id
         return info
 
@@ -2363,7 +2363,7 @@ class SolarEdgeMeter:
             hw_version=self.option,
             via_device=self.via_device,
         )
-        if self.hub.option_area_id is not None:
+        if self.hub.option_area_id:
             info["suggested_area"] = self.hub.option_area_id
         return info
 
@@ -2668,7 +2668,7 @@ class SolarEdgeBattery:
             sw_version=self.fw_version,
             via_device=self.via_device,
         )
-        if self.hub.option_area_id is not None:
+        if self.hub.option_area_id:
             info["suggested_area"] = self.hub.option_area_id
         return info
 
