@@ -14,6 +14,7 @@ from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_SCAN_INTER
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import selector
 
 from .const import (
     DEFAULT_NAME,
@@ -59,6 +60,16 @@ def generate_config_schema(step_id: str, user_input: dict[str, Any]) -> vol.Sche
                 default=user_input[ConfName.DEVICE_LIST],
             ): cv.string,
         }
+
+    if step_id == "user":
+        if user_input.get("area_id"):
+            schema |= {
+                vol.Optional("area_id", default=user_input["area_id"]): selector.AreaSelector()
+            }
+        else:
+            schema |= {
+                vol.Optional("area_id"): selector.AreaSelector()
+            }
 
     return vol.Schema(schema)
 
@@ -204,6 +215,7 @@ class SolaredgeModbusMultiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_HOST: "",
                 CONF_PORT: ConfDefaultInt.PORT,
                 ConfName.DEVICE_LIST: ConfDefaultStr.DEVICE_LIST,
+                "area_id": None,
             }
 
         return self.async_show_form(

@@ -190,6 +190,7 @@ class SolarEdgeModbusMultiHub:
             "retries", ModbusDefaults.Retries
         )
         self._id = entry_data[CONF_NAME].lower()
+        self.option_area_id = entry_data.get("area_id")
         self.inverters = []
         self.meters = []
         self.batteries = []
@@ -1957,7 +1958,7 @@ class SolarEdgeInverter:
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
-        return DeviceInfo(
+        info = DeviceInfo(
             identifiers={(DOMAIN, self.uid_base)},
             name=self.name,
             manufacturer=self.manufacturer,
@@ -1966,6 +1967,9 @@ class SolarEdgeInverter:
             sw_version=self.fw_version,
             hw_version=self.option,
         )
+        if self.hub.option_area_id is not None:
+            info["suggested_area"] = self.hub.option_area_id
+        return info
 
     @property
     def is_mmppt(self) -> bool:
@@ -2002,7 +2006,7 @@ class SolarEdgeMMPPTUnit:
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
-        return DeviceInfo(
+        info = DeviceInfo(
             identifiers={(DOMAIN, self.inverter.uid_base, self.mmppt_key)},
             name=f"{self.inverter.name} MPPT{self.unit}",
             manufacturer=self.inverter.manufacturer,
@@ -2011,6 +2015,9 @@ class SolarEdgeMMPPTUnit:
             serial_number=f"{self.mmppt_idstr}",
             via_device=(DOMAIN, self.inverter.uid_base),
         )
+        if self.hub.option_area_id is not None:
+            info["suggested_area"] = self.hub.option_area_id
+        return info
 
     @property
     def mmppt_id(self) -> str:
@@ -2346,7 +2353,7 @@ class SolarEdgeMeter:
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
-        return DeviceInfo(
+        info = DeviceInfo(
             identifiers={(DOMAIN, self.uid_base)},
             name=self.name,
             manufacturer=self.manufacturer,
@@ -2356,6 +2363,9 @@ class SolarEdgeMeter:
             hw_version=self.option,
             via_device=self.via_device,
         )
+        if self.hub.option_area_id is not None:
+            info["suggested_area"] = self.hub.option_area_id
+        return info
 
     @property
     def via_device(self) -> tuple[str, str]:
@@ -2649,7 +2659,7 @@ class SolarEdgeBattery:
     @property
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
-        return DeviceInfo(
+        info = DeviceInfo(
             identifiers={(DOMAIN, self.uid_base)},
             name=self.name,
             manufacturer=self.manufacturer,
@@ -2658,6 +2668,9 @@ class SolarEdgeBattery:
             sw_version=self.fw_version,
             via_device=self.via_device,
         )
+        if self.hub.option_area_id is not None:
+            info["suggested_area"] = self.hub.option_area_id
+        return info
 
     @property
     def via_device(self) -> tuple[str, str]:
