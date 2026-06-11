@@ -14,6 +14,7 @@ from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, CONF_SCAN_INTER
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import selector
 
 from .const import (
     DEFAULT_NAME,
@@ -59,6 +60,16 @@ def generate_config_schema(step_id: str, user_input: dict[str, Any]) -> vol.Sche
                 default=user_input[ConfName.DEVICE_LIST],
             ): cv.string,
         }
+
+    if step_id == "user":
+        if user_input.get("area_id"):
+            schema |= {
+                vol.Optional("area_id", default=user_input["area_id"]): selector.AreaSelector()
+            }
+        else:
+            schema |= {
+                vol.Optional("area_id"): selector.AreaSelector()
+            }
 
     return vol.Schema(schema)
 
@@ -204,19 +215,22 @@ class SolaredgeModbusMultiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_HOST: "",
                 CONF_PORT: ConfDefaultInt.PORT,
                 ConfName.DEVICE_LIST: ConfDefaultStr.DEVICE_LIST,
+                "area_id": None,
             }
+
+        schema = {
+            vol.Optional(CONF_NAME, default=user_input[CONF_NAME]): cv.string,
+            vol.Required(CONF_HOST, default=user_input[CONF_HOST]): cv.string,
+            vol.Required(CONF_PORT, default=user_input[CONF_PORT]): vol.Coerce(int),
+        }
+        if user_input.get("area_id"):
+            schema[vol.Optional("area_id", default=user_input["area_id"])] = selector.AreaSelector()
+        else:
+            schema[vol.Optional("area_id")] = selector.AreaSelector()
 
         return self.async_show_form(
             step_id="scan_ask_host",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(CONF_NAME, default=user_input[CONF_NAME]): cv.string,
-                    vol.Required(CONF_HOST, default=user_input[CONF_HOST]): cv.string,
-                    vol.Required(CONF_PORT, default=user_input[CONF_PORT]): vol.Coerce(
-                        int
-                    ),
-                },
-            ),
+            data_schema=vol.Schema(schema),
             errors=errors,
         )
 
@@ -330,23 +344,26 @@ class SolaredgeModbusMultiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_HOST: "",
                 CONF_PORT: ConfDefaultInt.PORT,
                 ConfName.DEVICE_LIST: ConfDefaultStr.DEVICE_LIST,
+                "area_id": None,
             }
+
+        schema = {
+            vol.Optional(CONF_NAME, default=user_input[CONF_NAME]): cv.string,
+            vol.Required(CONF_HOST, default=user_input[CONF_HOST]): cv.string,
+            vol.Required(CONF_PORT, default=user_input[CONF_PORT]): vol.Coerce(int),
+            vol.Required(
+                f"{ConfName.DEVICE_LIST}",
+                default=user_input[ConfName.DEVICE_LIST],
+            ): cv.string,
+        }
+        if user_input.get("area_id"):
+            schema[vol.Optional("area_id", default=user_input["area_id"])] = selector.AreaSelector()
+        else:
+            schema[vol.Optional("area_id")] = selector.AreaSelector()
 
         return self.async_show_form(
             step_id="manual",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(CONF_NAME, default=user_input[CONF_NAME]): cv.string,
-                    vol.Required(CONF_HOST, default=user_input[CONF_HOST]): cv.string,
-                    vol.Required(CONF_PORT, default=user_input[CONF_PORT]): vol.Coerce(
-                        int
-                    ),
-                    vol.Required(
-                        f"{ConfName.DEVICE_LIST}",
-                        default=user_input[ConfName.DEVICE_LIST],
-                    ): cv.string,
-                },
-            ),
+            data_schema=vol.Schema(schema),
             errors=errors,
         )
 
