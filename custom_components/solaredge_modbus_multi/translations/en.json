@@ -20,7 +20,8 @@
           "name": "Sensor Prefix",
           "host": "Inverter IP Address",
           "port": "Modbus/TCP Port",
-          "device_list": "Inverter Device ID List"
+          "device_list": "Inverter Device ID List",
+          "area_id": "Area"
         }
       },
       "scan_ask_host": {
@@ -28,7 +29,8 @@
         "data": {
           "name": "Sensor Prefix",
           "host": "Inverter IP Address",
-          "port": "Modbus/TCP Port"
+          "port": "Modbus/TCP Port",
+          "area_id": "Area"
         }
       },
       "scan_complete": {
